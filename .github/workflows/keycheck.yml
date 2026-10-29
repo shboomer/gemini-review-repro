@@ -1,0 +1,25 @@
+name: Key Fingerprint Check
+
+on:
+  push:
+    paths:
+      - '.github/workflows/keycheck.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fingerprint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fingerprint the GEMINI_API_KEY secret (sha256 prefix only)
+        env:
+          KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          FP=$(printf '%s' "$KEY" | sha256sum | cut -c1-10)
+          LEN=${#KEY}
+          echo "secret fingerprint: $FP"
+          echo "secret length: $LEN"
+          echo "known: K1=a2cfca72c3 K2=7137c0a92c K3=d7c9314369"
+          echo "last4: ...${KEY: -4}"
